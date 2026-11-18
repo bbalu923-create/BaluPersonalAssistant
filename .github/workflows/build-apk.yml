@@ -1,3 +1,4 @@
+
 name: Build Android APK
 
 on:
@@ -6,6 +7,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -14,13 +16,17 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - uses: android-actions/setup-android@v3
+      - name: Setup Android SDK
+        run: |
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "platforms;android-35" "build-tools;35.0.0"
 
       - name: Install Gradle
         run: |
           wget -q https://services.gradle.org/distributions/gradle-8.9-bin.zip
           unzip -q gradle-8.9-bin.zip
-          echo "$GITHUB_WORKSPACE/gradle-8.9/bin" >> $GITHUB_PATH
+          echo "$GITHUB_WORKSPACE/gradle-8.9/bin" >> "$GITHUB_PATH"
 
       - name: Build APK
         run: |
@@ -32,3 +38,4 @@ jobs:
         with:
           name: Balu-Assistant-APK
           path: BaluPersonalAssistant/app/build/outputs/apk/debug/app-debug.apk
+          
